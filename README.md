@@ -1,4 +1,3 @@
-Here’s your corrected README.md for the simple shell project:
 
 # simple_shell
 
