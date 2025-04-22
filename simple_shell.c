@@ -13,9 +13,9 @@ int execute_command(char *command, char *progname)
 	pid_t pid;
 	int status;
 
-	char *newline = strchr(command, '\n');
-
 	char *argv[2];
+
+	char *newline = strchr(command, '\n');
 
 	if (command == NULL)
 		return (1);
@@ -32,20 +32,14 @@ int execute_command(char *command, char *progname)
 	{
 		argv[0] = command;
 		argv[1] = NULL;
-		if (execve(command, argv, environ) == -1)
-		{
-			write(2, progname, strlen(progname));
-			write(2, ": No such file or directory\n", 28);
-			exit(1);
-		}
+		execve(command, argv, environ);
+		write(2, progname, strlen(progname));
+		write(2, ": No such file or directory\n", 28);
+		exit(1);
 	}
-	else if (pid > 0)
-		wait(&status);
-	else
-	{
-		perror("fork");
+	if (pid < 0)
 		return (1);
-	}
+	wait(&status);
 	return (0);
 }
 
@@ -61,35 +55,26 @@ int execute_command(char *command, char *progname)
 */
 int main(int argc, char **argv)
 {
-	char *input = NULL; /* Input buffer */
+	char *input = NULL;
 
-	size_t len = 0;     /* Length of input */
-	ssize_t nread;      /* Number of bytes read */
+	size_t len = 0;
+	ssize_t nread;
+
 	(void)argc;
-
-	/* Infinite loop to continuously read and execute commands */
 	while (1)
 	{
 		printf("#cisfun$ ");
-		fflush(stdout); /* Task 1: Display the prompt */
-		/* Read input from stdin */
+		fflush(stdout);
 		nread = getline(&input, &len, stdin);
-		/* Task 1: Handle End of File (Ctrl+D) */
 		if (nread == -1)
 		{
-			free(input);
 			printf("\n");
-			exit(0); /* Exit the shell */
+			free(input);
+			exit(0);
 		}
-
-		/* Task 1: Skip empty lines */
 		if (input[0] == '\n')
-		{
 			continue;
-		}
-
 		execute_command(input, argv[0]);
 	}
-	free(input); /* Task 1: Free input buffer before exiting */
 	return (0);
 }
