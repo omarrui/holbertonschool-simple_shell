@@ -17,6 +17,11 @@ int execute_command(char *command, char *progname)
 	/* Check for empty command */
 	if (command == NULL || *command == '\0')
 		return (1);
+	if (access(command, X_OK) == -1)
+	{
+		fprintf(stderr, "%s: No such file or directory\n", progname);
+		return (127);
+	}
 	argv = malloc(2 * sizeof(char *));
 	if (argv == NULL)
 	{
@@ -94,6 +99,12 @@ int main(int argc, char **argv)
 		/* Skip empty lines */
 		if (*line == '\0')
 			continue;
+		
+		if (strcmp(line, "exit") == 0)
+		{
+			free(line);
+			exit(0);
+		}
 
 		/* Execute command */
 		execute_command(line, argv[0]);
