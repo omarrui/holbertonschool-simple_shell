@@ -4,51 +4,52 @@
  * execute_command - execute the command enter in our shell
  *
  * @command: command to read and execute
- * @paraname: name of file
+ * @progname: name of file
  *
  * Return: 0 on success, 1 on failure
  */
-int execute_command(char *command, char *paraname)
+int execute_command(char *command, char *progname)
 {
 	pid_t pid;
 	int status;
-
 	char **argv;
 
 	/* Check for empty command */
-	if (command == NULL)
+	if (command == NULL || *command == '\0')
 		return (1);
-
 	argv = malloc(2 * sizeof(char *));
 	if (argv == NULL)
+	{
+		perror(progname);
 		return (1);
-
+	}
 	argv[0] = command;
 	argv[1] = NULL;
 	/* Create child process */
 	pid = fork();
 	if (pid == -1)
 	{
-		perror("Error");
+		free(argv);
+		perror(progname);
 		return (1);
 	}
-
 	if (pid == 0)
 	{
 		/* Child process */
 		if (execve(command, argv, environ) == -1)
 		{
-			perror(paraname);
-			exit(1);
+			perror(progname);
+			free(argv);
+			exit(127);
 		}
 	}
 	else
 	{
 		/* Parent process */
 		wait(&status);
+		free(argv);
 	}
-	free(argv);
-	return (0);
+	return (WEXITSTATUS(status));
 }
 
 /**
@@ -72,15 +73,16 @@ int main(int argc, char **argv)
 
 	while (1)
 	{
-		/* Print prompt */
-		printf("#cisfun$ ");
+		if (isatty(STDIN_FILENO))
+			printf("#cisfun$ ");
+		fflush(stdout);
 
 		/* Get command from user */
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
-			/* Handle Ctrl+D (EOF) */
-			printf("\n");
+			if (isatty(STDIN_FILENO))
+				printf("\n");
 			free(line);
 			exit(0);
 		}
@@ -90,7 +92,7 @@ int main(int argc, char **argv)
 			line[nread - 1] = '\0';
 
 		/* Skip empty lines */
-		if (line[0] == '\0')
+		if (*line == '\0')
 			continue;
 
 		/* Execute command */
