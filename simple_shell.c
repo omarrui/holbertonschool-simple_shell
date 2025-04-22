@@ -27,7 +27,7 @@ int execute_command(char *command)
 	{
 		if (execve(argv[0], argv, environ) == -1) /* Task 3: Execute command */
 		{
-			perror("Error");
+			perror("./shell");
 			exit(1);
 		}
 	}
@@ -63,7 +63,7 @@ int main(void)
 	/* Infinite loop to continuously read and execute commands */
 	while (1)
 	{
-		printf("$ ");
+		printf("#cisfun$ ");
 		fflush(stdout); /* Task 1: Display the prompt */
 		/* Read input from stdin */
 		nread = getline(&input, &len, stdin);
