@@ -4,85 +4,99 @@
  * execute_command - execute the command enter in our shell
  *
  * @command: command to read and execute
+ * @paraname: name of file
  *
  * Return: 0 on success, 1 on failure
  */
-int execute_command(char *command)
+int execute_command(char *command, char *paraname)
 {
-	char *argv[64];     /* Arguments array */
-	char *token;        /* Tokenized input */
-	int i;              /* Loop counter */
-	/* Task 3: Tokenize input into command and arguments */
-	token = strtok(command, " \n");
-	i = 0;
-	while (token != NULL)
+	pid_t pid;
+	int status;
+
+	char **argv;
+
+	/* Check for empty command */
+	if (command == NULL)
+		return (1);
+
+	argv = malloc(2 * sizeof(char *));
+	if (argv == NULL)
+		return (1);
+
+	argv[0] = command;
+	argv[1] = NULL;
+	/* Create child process */
+	pid = fork();
+	if (pid == -1)
 	{
-		argv[i] = token;
-		token = strtok(NULL, " \n");
-		i++;
+		perror("Error");
+		return (1);
 	}
-	argv[i] = NULL; /* Null-terminate the argument list */
-	/* Task 3: Fork a child process to execute the command */
-	if (fork() == 0) /* Child process */
+
+	if (pid == 0)
 	{
-		if (execve(argv[0], argv, environ) == -1) /* Task 3: Execute command */
+		/* Child process */
+		if (execve(command, argv, environ) == -1)
 		{
-			perror("./shell");
+			perror(paraname);
 			exit(1);
 		}
 	}
-	else /* Parent process */
+	else
 	{
-		wait(NULL); /* Task 3: Wait for child process to finish */
+		/* Parent process */
+		wait(&status);
 	}
-		/* Task 2: Placeholder for Task 2 functionality */
-		/**
-		 * Task 2 should handle:
-		 * show not found error with correct format
-		 * handle path (ls pwd...)
-		 * use access() to test commands
-		 * keep track of line count for error message
-		 */
+	free(argv);
 	return (0);
 }
 
 /**
- * main - Simple shell program
+ * main - call another function to read command
  *
- * Description: This program continuously prompts the user for a command,
- *              reads the input, and executes it using execve.
+ * @argc: nb arguments
+ * @argv: list of arguments
  *
- * Return: Always 0 (Success)
+ * Return: 0 or -1 on failure
  */
-int main(void)
+int main(int argc, char **argv)
 {
-	char *input = NULL; /* Input buffer */
-	size_t len = 0;     /* Length of input */
-	ssize_t nread;      /* Number of bytes read */
+	char *line = NULL;
 
-	/* Infinite loop to continuously read and execute commands */
+	size_t len = 0;
+	ssize_t nread;
+	(void)argc;
+
+	/* Setup signal handler */
+	signal(SIGINT, handle_signal);
+
 	while (1)
 	{
+		/* Print prompt */
 		printf("#cisfun$ ");
-		fflush(stdout); /* Task 1: Display the prompt */
-		/* Read input from stdin */
-		nread = getline(&input, &len, stdin);
-		/* Task 1: Handle End of File (Ctrl+D) */
+
+		/* Get command from user */
+		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
-			free(input);
+			/* Handle Ctrl+D (EOF) */
 			printf("\n");
-			exit(0); /* Exit the shell */
+			free(line);
+			exit(0);
 		}
 
-		/* Task 1: Skip empty lines */
-		if (input[0] == '\n')
-		{
+		/* Remove newline */
+		if (nread > 0 && line[nread - 1] == '\n')
+			line[nread - 1] = '\0';
+
+		/* Skip empty lines */
+		if (line[0] == '\0')
 			continue;
-		}
 
-		execute_command(input);
+		/* Execute command */
+		execute_command(line, argv[0]);
 	}
-	free(input); /* Task 1: Free input buffer before exiting */
+
+	free(line);
 	return (0);
 }
