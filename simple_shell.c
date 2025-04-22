@@ -1,73 +1,88 @@
 #include "shell.h"
 
 /**
-* execute_command - execute the command enter in our shell
-* @command: command to read and execute
-* @progname: name of the program
-* Return: 0 on success, 1 on failure
-*/
-int execute_command(char *command, char *progname)
+ * execute_command - execute the command enter in our shell
+ *
+ * @command: command to read and execute
+ *
+ * Return: 0 on success, 1 on failure
+ */
+int execute_command(char *command)
 {
-	pid_t pid;
-	int status;
-
-	char *argv[2];
-
-	char *newline = strchr(command, '\n');
-
-	if (command == NULL)
-		return (1);
-	if (newline)
-		*newline = '\0';
-	if (strchr(command, ' ') != NULL || (command[0] != '/' && command[0] != '.'))
+	char *argv[64];     /* Arguments array */
+	char *token;        /* Tokenized input */
+	int i;              /* Loop counter */
+	/* Task 3: Tokenize input into command and arguments */
+	token = strtok(command, " \n");
+	i = 0;
+	while (token != NULL)
 	{
-		write(2, progname, strlen(progname));
-		write(2, ": No such file or directory\n", 28);
-		return (1);
+		argv[i] = token;
+		token = strtok(NULL, " \n");
+		i++;
 	}
-	pid = fork();
-	if (pid == 0)
+	argv[i] = NULL; /* Null-terminate the argument list */
+	/* Task 3: Fork a child process to execute the command */
+	if (fork() == 0) /* Child process */
 	{
-		argv[0] = command;
-		argv[1] = NULL;
-		execve(command, argv, environ);
-		write(2, progname, strlen(progname));
-		write(2, ": No such file or directory\n", 28);
-		_exit(1);
+		if (execve(argv[0], argv, environ) == -1) /* Task 3: Execute command */
+		{
+			perror("./shell");
+			exit(1);
+		}
 	}
-	if (pid < 0)
-		return (1);
-	wait(&status);
+	else /* Parent process */
+	{
+		wait(NULL); /* Task 3: Wait for child process to finish */
+	}
+		/* Task 2: Placeholder for Task 2 functionality */
+		/**
+		 * Task 2 should handle:
+		 * show not found error with correct format
+		 * handle path (ls pwd...)
+		 * use access() to test commands
+		 * keep track of line count for error message
+		 */
 	return (0);
 }
 
 /**
-* main - Simple shell program
-* @argc: number of arguments
-* @argv: array of arguments
-* Return: Always 0 (Success)
-*/
-int main(int argc, char **argv)
+ * main - Simple shell program
+ *
+ * Description: This program continuously prompts the user for a command,
+ *              reads the input, and executes it using execve.
+ *
+ * Return: Always 0 (Success)
+ */
+int main(void)
 {
-	char *input = NULL;
+	char *input = NULL; /* Input buffer */
+	size_t len = 0;     /* Length of input */
+	ssize_t nread;      /* Number of bytes read */
 
-	size_t len = 0;
-	ssize_t nread;
-
-	(void)argc;
+	/* Infinite loop to continuously read and execute commands */
 	while (1)
 	{
-		write(1, "#cisfun$ ", 9);
+		printf("#cisfun$ ");
+		fflush(stdout); /* Task 1: Display the prompt */
+		/* Read input from stdin */
 		nread = getline(&input, &len, stdin);
+		/* Task 1: Handle End of File (Ctrl+D) */
 		if (nread == -1)
 		{
-			write(1, "\n", 1);
 			free(input);
-			exit(0);
+			printf("\n");
+			exit(0); /* Exit the shell */
 		}
+
+		/* Task 1: Skip empty lines */
 		if (input[0] == '\n')
+		{
 			continue;
-		execute_command(input, argv[0]);
+		}
+
+		execute_command(input);
 	}
+	free(input); /* Task 1: Free input buffer before exiting */
 	return (0);
 }
