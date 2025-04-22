@@ -1,62 +1,64 @@
 #include "shell.h"
 
 /**
- * execute_command - execute the command enter in our shell
- *
- * @command: command to read and execute
- *
- * Return: 0 on success, 1 on failure
- */
+* execute_command - execute the command enter in our shell
+*
+* @command: command to read and execute
+*
+* Return: 0 on success, 1 on failure
+*/
 int execute_command(char *command)
 {
-	char *argv[64];     /* Arguments array */
-	char *token;        /* Tokenized input */
-	int i;              /* Loop counter */
-	/* Task 3: Tokenize input into command and arguments */
-	token = strtok(command, " \n");
-	i = 0;
-	while (token != NULL)
+	pid_t pid;
+	int status;
+
+	char *newline = strchr(command, '\n');
+
+	if (command == NULL)
+		return (1);
+
+	/* Remove trailing newline */
+	if (newline)
+		*newline = '\0';
+
+	pid = fork();
+	if (pid == 0)
 	{
-		argv[i] = token;
-		token = strtok(NULL, " \n");
-		i++;
-	}
-	argv[i] = NULL; /* Null-terminate the argument list */
-	/* Task 3: Fork a child process to execute the command */
-	if (fork() == 0) /* Child process */
-	{
-		if (execve(argv[0], argv, environ) == -1) /* Task 3: Execute command */
+		char *argv[2];
+
+		argv[0] = command;
+		argv[1] = NULL;
+
+		if (execve(command, argv, environ) == -1)
 		{
-			perror("./shell");
+			fprintf(stderr, "./shell: No such file or directory\n");
 			exit(1);
 		}
 	}
-	else /* Parent process */
+	else if (pid > 0)
 	{
-		wait(NULL); /* Task 3: Wait for child process to finish */
+		wait(&status);
 	}
-		/* Task 2: Placeholder for Task 2 functionality */
-		/**
-		 * Task 2 should handle:
-		 * show not found error with correct format
-		 * handle path (ls pwd...)
-		 * use access() to test commands
-		 * keep track of line count for error message
-		 */
+	else
+	{
+		perror("fork");
+		return (1);
+	}
 	return (0);
 }
 
 /**
- * main - Simple shell program
- *
- * Description: This program continuously prompts the user for a command,
- *              reads the input, and executes it using execve.
- *
- * Return: Always 0 (Success)
- */
+* main - Simple shell program
+*
+* Description: This program continuously prompts the user for a command,
+*              reads the input, and executes it using execve.
+*
+* Return: Always 0 (Success)
+*/
 int main(void)
 {
 	char *input = NULL; /* Input buffer */
+
 	size_t len = 0;     /* Length of input */
 	ssize_t nread;      /* Number of bytes read */
 
