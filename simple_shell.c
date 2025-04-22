@@ -4,6 +4,7 @@
 * execute_command - execute the command enter in our shell
 *
 * @command: command to read and execute
+* @progname: the name of the programe
 *
 * Return: 0 on success, 1 on failure
 */
@@ -11,33 +12,30 @@ int execute_command(char *command, char *progname)
 {
 	pid_t pid;
 	int status;
+
 	char *newline = strchr(command, '\n');
+
+	char *argv[2];
 
 	if (command == NULL)
 		return (1);
 	if (newline)
 		*newline = '\0';
-	if (strchr(command, ' ') != NULL)
+	if (strchr(command, ' ') != NULL || (command[0] != '/' && command[0] != '.'))
 	{
-		fprintf(stderr, "%s: No such file or directory\n", progname);
-		return (1);
-	}
-	if (command[0] != '/' && command[0] != '.')
-	{
-		fprintf(stderr, "%s: No such file or directory\n", progname);
+		write(2, progname, strlen(progname));
+		write(2, ": No such file or directory\n", 28);
 		return (1);
 	}
 	pid = fork();
 	if (pid == 0)
 	{
-		char *argv[2];
-
 		argv[0] = command;
 		argv[1] = NULL;
-
 		if (execve(command, argv, environ) == -1)
 		{
-			fprintf(stderr, "%s: No such file or directory\n", progname);
+			write(2, progname, strlen(progname));
+			write(2, ": No such file or directory\n", 28);
 			exit(1);
 		}
 	}
@@ -64,6 +62,7 @@ int execute_command(char *command, char *progname)
 int main(int argc, char **argv)
 {
 	char *input = NULL; /* Input buffer */
+
 	size_t len = 0;     /* Length of input */
 	ssize_t nread;      /* Number of bytes read */
 	(void)argc;
