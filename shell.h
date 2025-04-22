@@ -3,12 +3,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 extern char **environ;
 
 int execute_command(char *command, char *progname);
+void handle_signal(int sig);
 
 #endif
