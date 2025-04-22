@@ -19,7 +19,7 @@ int execute_command(char *command, char *progname)
 		return (1);
 	if (access(command, X_OK) == -1)
 	{
-		fprintf(stderr, "%s: No such file or directory\n", progname);
+		fprintf(stderr, "%s: 1: %s: not found\n", progname, command);
 		return (127);
 	}
 	argv = malloc(2 * sizeof(char *));
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 		/* Skip empty lines */
 		if (*line == '\0')
 			continue;
-		
+
 		if (strcmp(line, "exit") == 0)
 		{
 			free(line);
