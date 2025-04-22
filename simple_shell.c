@@ -19,7 +19,7 @@ int execute_command(char *command, char *progname)
 		return (1);
 	if (access(command, X_OK) == -1)
 	{
-		fprintf(stderr, "%s: 1: %s: not found\n", progname, command);
+		fprintf(stderr, "%s: not found\n", progname);
 		return (127);
 	}
 	argv = malloc(2 * sizeof(char *));
@@ -35,7 +35,7 @@ int execute_command(char *command, char *progname)
 	if (pid == -1)
 	{
 		free(argv);
-		perror(progname);
+		perror("Error: fork failed");
 		return (1);
 	}
 	if (pid == 0)
@@ -43,7 +43,7 @@ int execute_command(char *command, char *progname)
 		/* Child process */
 		if (execve(command, argv, environ) == -1)
 		{
-			perror(progname);
+			fprintf(stderr, "%s: Cannot execute\n", progname);
 			free(argv);
 			exit(127);
 		}
