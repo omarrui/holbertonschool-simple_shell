@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-int exec_cmd(char **args);
 extern char **environ;
 
 #endif
