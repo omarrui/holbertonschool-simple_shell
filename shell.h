@@ -9,4 +9,6 @@
 
 extern char **environ;
 
+int execute_command(char *command, char *progname);
+
 #endif
