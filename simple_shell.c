@@ -72,10 +72,10 @@ int main(void)
 
         /* Task 2: Placeholder for Task 2 functionality */
         /* Task 2 should handle:
-           - Command error handling
-           - Displaying error messages
-           - Command execution in the context of a simple shell
-           - Managing end-of-file (Ctrl+D) properly
+           - show not found error with correct format 
+           - handle path (ls pwd...)
+           - use access() to test commands
+           - keep track of line count for error message
            */
     }
 
