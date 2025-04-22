@@ -13,14 +13,20 @@ int execute_command(char *command)
 	int status;
 
 	char *newline = strchr(command, '\n');
-
 	if (command == NULL)
 		return (1);
-
-	/* Remove trailing newline */
 	if (newline)
 		*newline = '\0';
-
+	if (strchr(command, ' ') != NULL)
+	{
+		fprintf(stderr, "./shell: No such file or directory\n");
+		return (1);
+	}
+	if (command[0] != '/' && command[0] != '.')
+	{
+		fprintf(stderr, "./shell: No such file or directory\n");
+		return (1);
+	}
 	pid = fork();
 	if (pid == 0)
 	{
@@ -36,9 +42,7 @@ int execute_command(char *command)
 		}
 	}
 	else if (pid > 0)
-	{
 		wait(&status);
-	}
 	else
 	{
 		perror("fork");
