@@ -11,20 +11,20 @@ int execute_command(char *command)
 {
 	pid_t pid;
 	int status;
-
 	char *newline = strchr(command, '\n');
+
 	if (command == NULL)
 		return (1);
 	if (newline)
 		*newline = '\0';
 	if (strchr(command, ' ') != NULL)
 	{
-		fprintf(stderr, "./shell: No such file or directory\n");
+		fprintf(stderr, "./simple_shell: No such file or directory\n");
 		return (1);
 	}
 	if (command[0] != '/' && command[0] != '.')
 	{
-		fprintf(stderr, "./shell: No such file or directory\n");
+		fprintf(stderr, "./simple_shell: No such file or directory\n");
 		return (1);
 	}
 	pid = fork();
@@ -37,7 +37,7 @@ int execute_command(char *command)
 
 		if (execve(command, argv, environ) == -1)
 		{
-			fprintf(stderr, "./shell: No such file or directory\n");
+			fprintf(stderr, "./simple_shell: No such file or directory\n");
 			exit(1);
 		}
 	}
