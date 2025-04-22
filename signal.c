@@ -10,5 +10,8 @@
 void handle_signal(int sig)
 {
 	(void)sig;
-	write(STDOUT_FILENO, "\n#cisfun$ ", 10);
+	if (isatty(STDIN_FILENO))
+		write(STDOUT_FILENO, "\n#cisfun$ ", 10);
+	else
+		write(STDOUT_FILENO, "\n", 1);
 }
