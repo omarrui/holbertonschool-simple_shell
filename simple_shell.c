@@ -2,10 +2,8 @@
 
 /**
 * execute_command - execute the command enter in our shell
-*
 * @command: command to read and execute
-* @progname: the name of the programe
-*
+* @progname: name of the program
 * Return: 0 on success, 1 on failure
 */
 int execute_command(char *command, char *progname)
@@ -35,7 +33,7 @@ int execute_command(char *command, char *progname)
 		execve(command, argv, environ);
 		write(2, progname, strlen(progname));
 		write(2, ": No such file or directory\n", 28);
-		exit(1);
+		_exit(1);
 	}
 	if (pid < 0)
 		return (1);
@@ -45,12 +43,8 @@ int execute_command(char *command, char *progname)
 
 /**
 * main - Simple shell program
-*
-* Description: This program continuously prompts the user for a command,
-*              reads the input, and executes it using execve.
-* @argc: nb arguments
-* @argv: list of arguments
-*
+* @argc: number of arguments
+* @argv: array of arguments
 * Return: Always 0 (Success)
 */
 int main(int argc, char **argv)
@@ -63,12 +57,11 @@ int main(int argc, char **argv)
 	(void)argc;
 	while (1)
 	{
-		printf("#cisfun$ ");
-		fflush(stdout);
+		write(1, "#cisfun$ ", 9);
 		nread = getline(&input, &len, stdin);
 		if (nread == -1)
 		{
-			printf("\n");
+			write(1, "\n", 1);
 			free(input);
 			exit(0);
 		}
