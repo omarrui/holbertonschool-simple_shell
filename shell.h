@@ -11,7 +11,7 @@
 
 extern char **environ;
 
-int execute_command(char *command, char *progname);
+int execute_command(char *command, char *progname, int count);
 void handle_signal(int sig);
 
 #endif
