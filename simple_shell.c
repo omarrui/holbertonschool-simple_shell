@@ -14,7 +14,7 @@ int execute_command(char *command, char *progname, int count)
 	pid_t pid;
 	int status, i = 0, arg_count = 0;
 	char **argv;
-	char *token, *cmd_copy;
+	char *token, *cmd_copy, *full_path, *tmp;
 
 	while (*command && *command == ' ')
 		command++;
@@ -52,13 +52,28 @@ int execute_command(char *command, char *progname, int count)
 
 	if (command == NULL || *command == '\0')
 		return (1);
-	if (access(command, X_OK) == -1)
+	if (strchr(argv[0], '/') == NULL)
+	{
+		full_path = find_command(argv[0]);
+		if (full_path != NULL)
+		{
+			tmp = strdup(full_path);
+			if (tmp == NULL)
+			{
+				free(full_path);
+				free(argv);
+				return (1);
+			}
+			argv[0] = tmp;
+			free(full_path);
+		}
+	}
+	if (access(argv[0], X_OK) == -1)
 	{
 		fprintf(stderr, "%s: %d: %s: not found\n", progname, count, argv[0]);
 		free(argv);
 		return (127);
 	}
-	/* Create child process */
 	pid = fork();
 	if (pid == -1)
 	{
@@ -68,7 +83,6 @@ int execute_command(char *command, char *progname, int count)
 	}
 	if (pid == 0)
 	{
-		/* Child process */
 		if (execve(argv[0], argv, environ) == -1)
 		{
 			fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
@@ -78,7 +92,6 @@ int execute_command(char *command, char *progname, int count)
 	}
 	else
 	{
-		/* Parent process */
 		waitpid(pid, &status, 0);
 		free(argv);
 		if (WIFEXITED(status))
@@ -106,16 +119,13 @@ int main(int argc, char **argv)
 	ssize_t nread;
 	(void)argc;
 
-	/* Setup signal handler */
 	signal(SIGINT, handle_signal);
-
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
 			printf("#cisfun$ ");
 		fflush(stdout);
 
-		/* Get command from user */
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
 		{
@@ -125,11 +135,9 @@ int main(int argc, char **argv)
 			exit(0);
 		}
 
-		/* Remove newline */
 		if (nread > 0 && line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
 
-		/* Skip empty lines and spaces */
 		cmd = line;
 		while (*cmd && *cmd == ' ')
 			cmd++;
@@ -143,7 +151,6 @@ int main(int argc, char **argv)
 			exit(0);
 		}
 
-		/* Execute command */
 		count++;
 		execute_command(cmd, argv[0], count);
 	}
