@@ -85,7 +85,6 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o simple_shell
 
 
 ## Flowchart
-## Flowchart
 
 ![Alt text](png/flowchart.png)
 
@@ -105,4 +104,3 @@ The following flowchart illustrates the process of the simple shell.
 	•	Omar Rouigui
 
 
-[def]: flowchart.png
