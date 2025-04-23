@@ -16,6 +16,12 @@ int execute_command(char *command, char *progname, int count)
 	char **argv;
 	char *token;
 
+	while (*command && *command == ' ')
+		command++;
+	
+	if (*command == '\0')
+		return (0);
+
 	argv = malloc(2 * sizeof(char *));
 	if (argv == NULL)
 	{
@@ -30,8 +36,6 @@ int execute_command(char *command, char *progname, int count)
 		i++;
 	}
 	argv[i] = NULL;
-	while (*command && *command == ' ')
-		command++;
 
 	if (command == NULL || *command == '\0')
 		return (1);
@@ -126,8 +130,8 @@ int main(int argc, char **argv)
 		}
 
 		/* Execute command */
-		execute_command(cmd, argv[0], count);
 		count++;
+		execute_command(cmd, argv[0], count);
 	}
 
 	free(line);
