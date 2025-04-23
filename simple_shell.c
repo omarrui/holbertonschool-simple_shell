@@ -12,9 +12,24 @@
 int execute_command(char *command, char *progname, int count)
 {
 	pid_t pid;
-	int status;
+	int status, i = 0;
 	char **argv;
+	char *token;
 
+	argv = malloc(2 * sizeof(char *));
+	if (argv == NULL)
+	{
+		perror(progname);
+		return (1);
+	}
+	token = strtok(command, " \n");
+	while (token != NULL)
+	{
+		argv[i] = token;
+		token = strtok(NULL, " \n");
+		i++;
+	}
+	argv[i] = NULL;
 	while (*command && *command == ' ')
 		command++;
 
@@ -25,14 +40,6 @@ int execute_command(char *command, char *progname, int count)
 		fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
 		return (127);
 	}
-	argv = malloc(2 * sizeof(char *));
-	if (argv == NULL)
-	{
-		perror(progname);
-		return (1);
-	}
-	argv[0] = command;
-	argv[1] = NULL;
 	/* Create child process */
 	pid = fork();
 	if (pid == -1)
@@ -44,18 +51,21 @@ int execute_command(char *command, char *progname, int count)
 	if (pid == 0)
 	{
 		/* Child process */
-		if (execve(command, argv, environ) == -1)
+		if (execve(argv[0], argv, environ) == -1)
 		{
 			fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
 			free(argv);
-			exit(127);
+			exit(126);
 		}
 	}
 	else
 	{
 		/* Parent process */
-		wait(&status);
+		waitpid(pid, &status, 0);
 		free(argv);
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+		return (1);
 	}
 	return (WEXITSTATUS(status));
 }
@@ -116,7 +126,8 @@ int main(int argc, char **argv)
 		}
 
 		/* Execute command */
-		execute_command(cmd, argv[0], count + 1);
+		execute_command(cmd, argv[0], count);
+		count++;
 	}
 
 	free(line);
