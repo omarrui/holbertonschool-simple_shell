@@ -5,10 +5,11 @@
  *
  * @command: command to read and execute
  * @progname: name of file
+ * @count: nb command
  *
  * Return: 0 on success, 1 on failure
  */
-int execute_command(char *command, char *progname)
+int execute_command(char *command, char *progname, int count)
 {
 	pid_t pid;
 	int status;
@@ -21,7 +22,7 @@ int execute_command(char *command, char *progname)
 		return (1);
 	if (access(command, X_OK) == -1)
 	{
-		fprintf(stderr, "%s: not found\n", progname);
+		fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
 		return (127);
 	}
 	argv = malloc(2 * sizeof(char *));
@@ -45,7 +46,7 @@ int execute_command(char *command, char *progname)
 		/* Child process */
 		if (execve(command, argv, environ) == -1)
 		{
-			fprintf(stderr, "%s: Cannot execute\n", progname);
+			fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
 			free(argv);
 			exit(127);
 		}
@@ -71,6 +72,7 @@ int main(int argc, char **argv)
 {
 	char *line = NULL;
 	char *cmd;
+	int count = 0;
 
 	size_t len = 0;
 	ssize_t nread;
@@ -114,7 +116,7 @@ int main(int argc, char **argv)
 		}
 
 		/* Execute command */
-		execute_command(cmd, argv[0]);
+		execute_command(cmd, argv[0], count + 1);
 	}
 
 	free(line);
