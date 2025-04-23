@@ -14,7 +14,9 @@ int execute_command(char *command, char *progname)
 	int status;
 	char **argv;
 
-	/* Check for empty command */
+	while (*command && *command == ' ')
+		command++;
+
 	if (command == NULL || *command == '\0')
 		return (1);
 	if (access(command, X_OK) == -1)
@@ -68,6 +70,7 @@ int execute_command(char *command, char *progname)
 int main(int argc, char **argv)
 {
 	char *line = NULL;
+	char *cmd;
 
 	size_t len = 0;
 	ssize_t nread;
@@ -96,18 +99,22 @@ int main(int argc, char **argv)
 		if (nread > 0 && line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
 
-		/* Skip empty lines */
-		if (*line == '\0')
+		/* Skip empty lines and spaces */
+		cmd = line;
+		while (*cmd && *cmd == ' ')
+			cmd++;
+
+		if (*cmd == '\0')
 			continue;
 
-		if (strcmp(line, "exit") == 0)
+		if (strcmp(cmd, "exit") == 0)
 		{
 			free(line);
 			exit(0);
 		}
 
 		/* Execute command */
-		execute_command(line, argv[0]);
+		execute_command(cmd, argv[0]);
 	}
 
 	free(line);
