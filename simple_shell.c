@@ -145,12 +145,10 @@ int main(int argc, char **argv)
 		if (*cmd == '\0')
 			continue;
 
-		if (strcmp(cmd, "exit") == 0)
-		{
-			free(line);
-			exit(0);
-		}
-
+        if (strncmp(cmd, "exit", 4) == 0)
+        {
+            handle_exit(argv, line);
+        }
 		count++;
 		execute_command(cmd, argv[0], count);
 	}
