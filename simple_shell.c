@@ -12,9 +12,9 @@
 int execute_command(char *command, char *progname, int count)
 {
 	pid_t pid;
-	int status, i = 0;
+	int status, i = 0, arg_count = 0;
 	char **argv;
-	char *token;
+	char *token, *cmd_copy;
 
 	while (*command && *command == ' ')
 		command++;
@@ -22,14 +22,27 @@ int execute_command(char *command, char *progname, int count)
 	if (*command == '\0')
 		return (0);
 
-	argv = malloc(2 * sizeof(char *));
+	cmd_copy = strdup(command);
+	if (cmd_copy == NULL)
+	{
+		perror(progname);
+		return (1);
+	}
+	token = strtok(cmd_copy, " \n");
+	while (token != NULL)
+	{
+		arg_count++;
+		token = strtok(NULL, " \n");
+	}
+	free(cmd_copy);
+	argv = malloc((arg_count + 1) * sizeof(char *));
 	if (argv == NULL)
 	{
 		perror(progname);
 		return (1);
 	}
 	token = strtok(command, " \n");
-	while (token != NULL)
+	while (token != NULL && i < arg_count)
 	{
 		argv[i] = token;
 		token = strtok(NULL, " \n");
@@ -41,7 +54,8 @@ int execute_command(char *command, char *progname, int count)
 		return (1);
 	if (access(command, X_OK) == -1)
 	{
-		fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
+		fprintf(stderr, "%s: %d: %s: not found\n", progname, count, argv[0]);
+		free(argv);
 		return (127);
 	}
 	/* Create child process */
