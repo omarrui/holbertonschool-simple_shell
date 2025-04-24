@@ -1,6 +1,51 @@
 #include "shell.h"
 
 /**
+ * execute_builtin - check if command is built-in and execute it
+ *
+ * @argv: array of command arguments
+ * @progname: program name for error messages
+ * @line: input line to free if exiting
+ *
+ * Return: 0 if built-in was executed, 1 if not a built-in
+ */
+int execute_builtin(char **argv, char *progname, char *line)
+{
+	int status = 0, i;
+	char *dir = argv[1];
+
+	if (!argv || !argv[0])
+		return (1);
+
+	if (strcmp(argv[0], "exit") == 0)
+	{
+		if (argv[1] != NULL)
+			status = atoi(argv[1]);
+		free(line);
+		exit(status);
+	}
+
+	if (strcmp(argv[0], "env") == 0)
+	{
+		for (i = 0; environ[i]; i++)
+			printf("%s\n", environ[i]);
+		return (0);
+	}
+
+	if (strcmp(argv[0], "cd") == 0)
+	{
+		if (dir == NULL || strcmp(dir, "~") == 0)
+			dir = _getenv("HOME");
+
+		if (chdir(dir) == -1)
+			fprintf(stderr, "%s: cd: %s: No such file or directory\n",
+				progname, argv[1]);
+		return (0);
+	}
+	return (1);
+}
+
+/**
  * execute_command - execute the command enter in our shell
  *
  * @command: command to read and execute
@@ -49,6 +94,12 @@ int execute_command(char *command, char *progname, int count)
 		i++;
 	}
 	argv[i] = NULL;
+
+	if (!execute_builtin(argv, progname, command))
+	{
+		free(argv);
+		return (0);
+	}
 
 	if (command == NULL || *command == '\0')
 		return (1);
@@ -153,10 +204,6 @@ int main(int argc, char **argv)
 		if (*cmd == '\0')
 			continue;
 
-        if (strncmp(cmd, "exit", 4) == 0)
-        {
-            handle_exit(argv, line);
-        }
 		count++;
 		execute_command(cmd, argv[0], count);
 	}
