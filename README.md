@@ -79,13 +79,23 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o simple_shell
 - In case of permission denied, the return value is `126`.
 
 ## Examples
+These are a few examples of how our code works:
+if we want to show a list :
+![ls](images/ls.png)
 
+if we want to see an advanced list:
+![ls -l](images/ls-l.png)
 
+if we want to see the exit:
+![exit](images/exit.png)
+
+if we want to see the environment :
+![environment](images/env.png)
 
 
 
 ## Flowchart
-<img src="png/flowchart.png"/>
+![Flowchart](images/flowchart.png)
 
 
 The following flowchart illustrates the process of the simple shell.
