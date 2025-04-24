@@ -1,0 +1,67 @@
+.TH SIMPLE_SHELL 1 "April 2025" "1.0" "Simple Shell Manual"
+
+.SH NAME
+simple_shell \- simple UNIX command line interpreter
+
+.SH SYNOPSIS
+.B simple_shell
+is a simple UNIX command interpreter that executes commands read from standard input.
+
+.SH OVERVIEW
+The shell reads commands from the terminal, validaties them and executes the commands.
+
+.SH INVOCATION
+Simple shell can be invoked by typing ./hsh in the terminal.
+
+.SH FEATURES
+.IP \[bu] 2
+Displays a prompt and waits for user input
+.IP \[bu] 2
+Executes simple command lines
+.IP \[bu] 2
+Handles EOF condition (Ctrl+D)
+.IP \[bu] 2
+Handles command lines with arguments
+.IP \[bu] 2
+Handles command exit
+
+.SH EXAMPLES
+.PP
+.B Interactive Mode:
+.PP
+$ ./hsh
+.PP
+#cisfun$ /bin/ls
+.PP
+file1 file2 file3
+.PP
+#cisfun$ exit
+.PP
+.B Non-Interactive Mode:
+.PP
+$ echo "/bin/ls" | ./hsh
+.PP
+file1 file2 file3
+
+.SH EXIT STATUS
+The shell returns:
+.IP \[bu] 2
+0 for normal execution
+.IP \[bu] 2
+127 when command is not found
+.IP \[bu] 2
+1 for other errors
+
+.SH ENVIRONMENT
+The shell operates in the current environment of the user.
+
+.SH BUGS
+No known bugs.
+
+.SH AUTHORS
+GIRARGEY Julien and ROUIGUI Omar - Holberton School
+
+.SH SEE ALSO
+.BR sh (1),
+.BR bash (1),
+.BR csh (1)
