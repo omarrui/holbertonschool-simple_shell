@@ -13,44 +13,24 @@
 */
 char *_getenv(const char *name)
 {
-	int i, j;
-
-	char *compare;
+	int i;
 
 	char *value;
+
+	size_t name_len;
 
 	if (name == NULL)
 		return (NULL);
 
-	compare = malloc(strlen(name) + 1);
-	if (compare == NULL)
-		return (NULL);
+	name_len = strlen(name);
 
-	i = 0;
-	while (environ[i])
+	for (i = 0; environ[i]; i++)
 	{
-		compare = malloc(strlen(environ[i]) + 1);
-		if (compare == NULL)
-			return (NULL);
-
-		j = 0;
-		while (environ[i][j] != '=' && environ[i][j] != '\0')
+		if (strncmp(environ[i], name, name_len) == 0 && environ[i][name_len] == '=')
 		{
-			compare[j] = environ[i][j];
-			j++;
-		}
-		compare[j] = '\0';
-
-		/* si les deux chaîne sont pareil */
-		if (strcmp(compare, name) == 0)
-		{
-			/* dupliquer dans value, le contenue de environ[i] a partir de j + 1 */
-			value = strdup(environ[i] + j + 1);
-			free(compare);
+			value = strdup(environ[i] + name_len + 1);
 			return (value);
 		}
-		i++;
 	}
-	free(compare);
 	return (NULL);
 }
