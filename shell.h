@@ -16,5 +16,6 @@ int execute_command(char *command, char *progname, int count);
 void handle_signal(int sig);
 char *_getenv(const char *name);
 char *find_command(char *command);
+int execute_builtin(char **argv, char *progname, char *line);
 
 #endif
