@@ -90,12 +90,12 @@ if we want to see the exit:
 ![exit](images/exit.png)
 
 if we want to see the environment :
-![environment](images/env.png)
+![environmen](images/env.png)
 
 
 
 ## Flowchart
-![Flowchart](images/flowchart.png)
+![Flowchart](images/floowchart.png)
 
 
 The following flowchart illustrates the process of the simple shell.
@@ -104,7 +104,8 @@ The following flowchart illustrates the process of the simple shell.
 
 
 ## Man Page
-
+in order to open the man page we need to run  man ./man_1_simple_shell
+![manpage](images/manpage.png)
 
 ## Bugs
 	No bugs out of yet
