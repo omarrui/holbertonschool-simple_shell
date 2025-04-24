@@ -81,20 +81,25 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o simple_shell
 ## Examples
 These are a few examples of how our code works:
 if we want to show a list :
+
 ![ls](images/ls.png)
 
 if we want to see an advanced list:
+
 ![ls -l](images/ls-l.png)
 
 if we want to see the exit:
+
 ![exit](images/exit.png)
 
 if we want to see the environment :
+
 ![environmen](images/env.png)
 
 
 
 ## Flowchart
+
 ![Flowchart](images/floowchart.png)
 
 
@@ -104,7 +109,11 @@ The following flowchart illustrates the process of the simple shell.
 
 
 ## Man Page
-in order to open the man page we need to run  man ./man_1_simple_shell
+in order to open the man page we need to run  man:
+
+./man_1_simple_shell
+
+
 ![manpage](images/manpage.png)
 
 ## Bugs
