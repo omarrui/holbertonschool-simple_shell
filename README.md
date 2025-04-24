@@ -105,7 +105,11 @@ if we want to see the environment :
 
 The following flowchart illustrates the process of the simple shell.
 
+## Memory Leaks
+To check for memory leaks, use the `valgrind` tool:
 
+```bash
+valgrind --leak-check=full ./simple_shell
 
 
 ## Man Page
