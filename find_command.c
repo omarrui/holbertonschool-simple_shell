@@ -7,7 +7,7 @@
 */
 char *find_command(char *command)
 {
-	char *path = getenv("PATH");
+	char *path = _getenv("PATH");
 
 	char *path_copy, *dir, *cmd_path;
 
@@ -17,6 +17,7 @@ char *find_command(char *command)
 		return (NULL);
 
 	path_copy = strdup(path);
+	free(path);
 	if (!path_copy)
 		return (NULL);
 

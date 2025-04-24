@@ -58,25 +58,29 @@ int execute_command(char *command, char *progname, int count)
 		if (full_path != NULL)
 		{
 			tmp = strdup(full_path);
+			free(full_path);
 			if (tmp == NULL)
 			{
-				free(full_path);
 				free(argv);
 				return (1);
 			}
 			argv[0] = tmp;
-			free(full_path);
 		}
 	}
+
 	if (access(argv[0], X_OK) == -1)
 	{
 		fprintf(stderr, "%s: %d: %s: not found\n", progname, count, argv[0]);
+		if (argv[0] != command)
+			free(argv[0]);
 		free(argv);
 		return (127);
 	}
 	pid = fork();
 	if (pid == -1)
 	{
+		if (argv[0] != command)
+			free(argv[0]);
 		free(argv);
 		perror("Error: fork failed");
 		return (1);
@@ -86,6 +90,8 @@ int execute_command(char *command, char *progname, int count)
 		if (execve(argv[0], argv, environ) == -1)
 		{
 			fprintf(stderr, "%s: %d: %s: not found\n", progname, count, command);
+			if (argv[0] != command)
+				free(argv[0]);
 			free(argv);
 			exit(126);
 		}
@@ -93,6 +99,8 @@ int execute_command(char *command, char *progname, int count)
 	else
 	{
 		waitpid(pid, &status, 0);
+		if (argv[0] != command)
+			free(argv[0]);
 		free(argv);
 		if (WIFEXITED(status))
 			return (WEXITSTATUS(status));
@@ -123,7 +131,7 @@ int main(int argc, char **argv)
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-			printf("#cisfun$ ");
+			printf("($) ");
 		fflush(stdout);
 
 		nread = getline(&line, &len, stdin);
